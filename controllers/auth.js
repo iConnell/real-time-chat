@@ -114,7 +114,7 @@ const resetPassword = async (req, res) => {
           <h3>Hi! You cannot seem to remember your password.</h3>
           <h4>Don"t worry, we've got you covered</h4>
           <h4>Click the link below to reset your password</h4>
-          <a href="${process.env.HOST}/auth/reset-password/${resetPasswordToken}">Reset Password</a>
+          <a href="${process.env.HOST}/api/auth/reset-password-confirm/${resetPasswordToken}">Reset Password</a>
         </div>
       `,
     });

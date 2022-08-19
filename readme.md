@@ -2,4 +2,4 @@
 
 ### Todos
 - [ ] Invalidate token when new one is created
-- [x] Username or email login
+- [ ] Username or email login
