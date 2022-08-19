@@ -1,10 +1,13 @@
 require("express-async-errors");
 const express = require("express");
 const mongoose = require("mongoose");
+const errorHandlerMiddleware = require("./middlewares/errorHandler");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 8000;
 
