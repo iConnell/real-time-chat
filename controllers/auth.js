@@ -44,7 +44,6 @@ const verifyEmail = async (req, res) => {
   res.status(200).json({ msg: "Account verified" });
 };
 
-// Todo: Username or email login
 const login = async (req, res) => {
   const { username, password } = req.body;
 
@@ -95,6 +94,60 @@ const changePassword = async (req, res) => {
   res.status(200).send("Password Changed Successfully");
 };
 
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new BadRequestError("You must enter your email");
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    const resetPasswordToken = await user.createToken();
+
+    await emailTransport.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: email,
+      subject: "Password Reset",
+      html: `
+        <div>
+          <h3>Hi! You cannot seem to remember your password.</h3>
+          <h4>Don"t worry, we've got you covered</h4>
+          <h4>Click the link below to reset your password</h4>
+          <a href="${process.env.HOST}/auth/reset-password/${resetPasswordToken}">Reset Password</a>
+        </div>
+      `,
+    });
+  } catch (error) {
+    // pass
+  }
+
+  res
+    .status(200)
+    .send("A Password reset email will be sent if user with that email exists");
+};
+
+const resetPasswordConfirm = async (req, res) => {
+  const { resetPasswordToken } = req.params;
+
+  const { username } = jwt.verify(resetPasswordToken, process.env.JWT_SECRET);
+
+  const { password, password1 } = req.body;
+  if (!password || !password1) {
+    throw new BadRequestError("Enter new password");
+  }
+
+  if (password !== password1) {
+    throw new BadRequestError("Passwords must match");
+  }
+
+  const user = await User.findOne({ username });
+
+  user.password = password;
+  user.save();
+  res.status(200).send("Password changed successfully");
+};
+
 // For testing purposes
 const deleteAllUsers = async (req, res) => {
   const del = await User.deleteMany({});
@@ -107,5 +160,7 @@ module.exports = {
   register,
   verifyEmail,
   changePassword,
+  resetPassword,
+  resetPasswordConfirm,
   deleteAllUsers,
 };
