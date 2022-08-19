@@ -45,12 +45,14 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+// Hashes password upon signup
 UserSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.methods.createVerificationToken = async function () {
+// Generates email verification token
+UserSchema.methods.createToken = async function () {
   return jwt.sign(
     { username: this.username, id: this.id },
     process.env.JWT_SECRET,
@@ -58,10 +60,9 @@ UserSchema.methods.createVerificationToken = async function () {
   );
 };
 
+// Checks input password against hashed value
 UserSchema.methods.checkPassword = async function (password) {
-  const isMatch = await bcrypt.compare(password, this.password);
-  console.log(isMatch);
-  return isMatch;
+  return await bcrypt.compare(password, this.password);
 };
 
 module.exports = mongoose.model("User", UserSchema);
