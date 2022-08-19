@@ -52,6 +52,7 @@ UserSchema.pre("save", async function () {
 });
 
 // Generates email verification token
+// Invalidate token when new one is created
 UserSchema.methods.createToken = async function () {
   return jwt.sign(
     { username: this.username, id: this.id },

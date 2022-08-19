@@ -1,4 +1,4 @@
-const { UnauthorizedError, BadRequestError } = require("../errors");
+const { UnauthorisedError, BadRequestError } = require("../errors");
 const User = require("../models/User");
 const emailTransport = require("../utils/sendEmail");
 const jwt = require("jsonwebtoken");
@@ -60,7 +60,7 @@ const login = async (req, res) => {
   const isMatch = await user.checkPassword(password);
 
   if (!isMatch) {
-    throw new UnauthorizedError("Username or password incorrect");
+    throw new UnauthorisedError("Username or password incorrect");
   }
 
   if (!user.isActive) {
@@ -71,6 +71,28 @@ const login = async (req, res) => {
 
   const token = await user.createToken();
   res.status(200).json({ token });
+};
+
+const changePassword = async (req, res) => {
+  const { username } = req.user;
+
+  const { password, newPassword } = req.body;
+  if (!password || !newPassword) {
+    throw new BadRequestError("Enter old and new password");
+  }
+
+  const user = await User.findOne({ username });
+
+  const isMatch = await user.checkPassword(password);
+
+  if (!isMatch) {
+    throw new UnauthorisedError("Wrong password");
+  }
+
+  user.password = newPassword;
+  user.save();
+
+  res.status(200).send("Password Changed Successfully");
 };
 
 // For testing purposes
@@ -84,5 +106,6 @@ module.exports = {
   login,
   register,
   verifyEmail,
+  changePassword,
   deleteAllUsers,
 };

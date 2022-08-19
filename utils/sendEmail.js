@@ -8,3 +8,5 @@ const tranporter = nodemailer.createTransport({
     pass: process.env.ELASTIC_API_KEY,
   },
 });
+
+module.exports = tranporter;

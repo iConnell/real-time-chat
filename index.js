@@ -1,12 +1,17 @@
+require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
 const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth");
 const errorHandlerMiddleware = require("./middlewares/errorHandler");
-require("dotenv").config();
+const authMiddleware = require("./middlewares/auth");
 
 const app = express();
 app.use(express.json());
 
+app.use("/api/auth/", authRoutes);
+
+//app.use(authMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 8000;
