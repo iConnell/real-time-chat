@@ -7,6 +7,7 @@ const errorHandlerMiddleware = require("./middlewares/errorHandler");
 const { authMiddleware, socketMiddleware } = require("./middlewares/auth");
 const http = require("http");
 const { Server } = require("socket.io");
+const chat = require("./chat/chat");
 
 const app = express();
 const server = http.createServer(app);
@@ -22,6 +23,8 @@ const port = process.env.PORT || 8000;
 
 const io = new Server(server);
 io.use(socketMiddleware);
+
+io.on("connection", chat);
 
 const start = async () => {
   try {
