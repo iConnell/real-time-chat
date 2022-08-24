@@ -4,14 +4,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const errorHandlerMiddleware = require("./middlewares/errorHandler");
-const authMiddleware = require("./middlewares/auth");
+const { authMiddleware, socketMiddleware } = require("./middlewares/auth");
 const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-
-const io = new Server(server);
 
 app.use(express.json());
 
@@ -21,6 +19,9 @@ app.use("/api/auth/", authRoutes);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 8000;
+
+const io = new Server(server);
+io.use(socketMiddleware);
 
 const start = async () => {
   try {
