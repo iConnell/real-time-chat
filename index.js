@@ -21,7 +21,11 @@ app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 8000;
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 io.use(socketMiddleware);
 
 io.on("connection", chat);

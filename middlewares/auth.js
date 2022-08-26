@@ -21,21 +21,15 @@ const authMiddleware = async (req, res, next) => {
 };
 
 const socketMiddleware = async (socket, next) => {
-  const authHeader = socket.handshake.headers.authorisation;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    next(new UnauthorisedError("No authorisation token"));
-  }
+  const token = socket.handshake.auth.token;
 
   try {
-    const token = authHeader.split(" ")[1];
     decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { username, id } = decoded;
     socket.user = { username, id };
     next();
   } catch (error) {
-    //next(new Error("Invalid token"));
-    next();
+    next(new UnauthorisedError("Invalid token"));
   }
 };
 
